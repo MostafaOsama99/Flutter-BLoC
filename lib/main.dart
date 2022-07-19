@@ -18,6 +18,7 @@ extension RandomElement<T> on Iterable<T>{
 // BLoC sets on top of Cubit
 // BLoC could produce many states per event however redux produces only one
 // state per event
+
 class NamesCubit extends Cubit<String?> {
   /// Cubit and BLoC requires an initial state
   NamesCubit() : super(null);
