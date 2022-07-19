@@ -16,6 +16,8 @@ extension RandomElement<T> on Iterable<T>{
 
 // Cubit sets on top of Steams and StreamController, and they are very simple to use
 // BLoC sets on top of Cubit
+// BLoC could produce many states per event however redux produces only one
+// state per event
 class NamesCubit extends Cubit<String?> {
   /// Cubit and BLoC requires an initial state
   NamesCubit() : super(null);
@@ -32,9 +34,8 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp
+  const MyApp({Key? key}) : super(key: key);
 
-  ({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -49,9 +50,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage
-
-  ({super.key});
+  const MyHomePage({Key? key}) : super(key: key);
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -86,7 +85,8 @@ class _MyHomePageState extends State<MyHomePage> {
       body: StreamBuilder<String?>(
           stream: cubit.stream,
           builder: (context, snapshot) {
-            final button = TextButton(onPressed: () => cubit.pickRandomName(), child: const Text('Pick a random name'));
+            final button = TextButton(onPressed: () => cubit.pickRandomName(),
+                child: const Text('Pick a random name'));
 
             switch (snapshot.connectionState) {
               case ConnectionState.none:
