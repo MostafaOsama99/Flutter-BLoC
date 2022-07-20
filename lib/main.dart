@@ -5,32 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:developer' as devtools show log;
 
+import 'bloc/bloc_actions.dart';
+import 'bloc/person.dart';
+import 'bloc/persons_bloc.dart';
+
 extension Log on Object {
   void log() => devtools.log(toString());
 }
 
-// when creating a BLoC we need to know what kind of EVENT does this BLoC accept
-// and what of a STATE does this BLoC produce
-// all BLoCs have multiple events, and produces multiple states
 
-// this to make the events from the same type
-@immutable
-abstract class LoadAction {
-  const LoadAction();
-}
-
-enum PersonUrl { persons1, persons2 }
-
-extension UrlString on PersonUrl {
-  String get urlString {
-    switch (this) {
-      case PersonUrl.persons1:
-        return 'http://127.0.0.1:5500/api/persons1.json';
-      case PersonUrl.persons2:
-        return 'http://127.0.0.1:5500/api/persons2.json';
-    }
-  }
-}
 
 extension Subscript<T> on Iterable<T> {
   T? operator [](int index) =>
@@ -45,52 +28,9 @@ Future<Iterable<Person>> getPersons(String url) => HttpClient()
     .then((str) => json.decode(str) as List)
     .then((list) => list.map((e) => Person.fromJson(e)));
 
-@immutable
-class FetchResult {
-  final bool isRetrievedFromCash;
-  final Iterable<Person> persons;
 
-  const FetchResult({required this.isRetrievedFromCash, required this.persons});
 
-  @override
-  String toString() => 'FetchResults:\n\tis Retrieved from cash: '
-      '$isRetrievedFromCash\n\tPersons: $persons';
-}
 
-@immutable
-class LoadPersonsAction implements LoadAction {
-  final PersonUrl url;
-
-  const LoadPersonsAction({required this.url});
-}
-
-class Person {
-  late final String name;
-  late final int age;
-
-  Person.fromJson(Map<String, dynamic> json) {
-    age = json['age'];
-    name = json['name'];
-  }
-}
-
-// here it comes
-class PersonsBloc extends Bloc<LoadAction, FetchResult?> {
-  final Map<String, Iterable<Person>> _cash = {};
-
-  PersonsBloc() : super(null) {
-    on<LoadPersonsAction>((event, emit) async {
-      final url = event.url;
-      if (_cash[url] != null) {
-        emit(FetchResult(isRetrievedFromCash: true, persons: _cash[url]!));
-      } else {
-        final result = await getPersons(url.urlString);
-        _cash[url.urlString] = result;
-        emit(FetchResult(isRetrievedFromCash: false, persons: result));
-      }
-    });
-  }
-}
 
 void main() {
   runApp(const MyApp());
@@ -133,12 +73,13 @@ class _MyHomePageState extends State<MyHomePage> {
               TextButton(
                   onPressed: () => context
                       .read<PersonsBloc>()
-                      .add(const LoadPersonsAction(url: PersonUrl.persons1)),
+                      .add(const LoadPersonsAction(url: persons1Url, loader: getPersons)),
                   child: const Text('load json #1')),
               TextButton(
                   onPressed: () => context
                       .read<PersonsBloc>()
-                      .add(const LoadPersonsAction(url: PersonUrl.persons1)),
+                      .add(const LoadPersonsAction(url: persons2Url, loader:
+                  getPersons)),
                   child: const Text('load json #2')),
             ],
           ),
