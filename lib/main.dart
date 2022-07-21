@@ -95,6 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
             }
             return Expanded(
                 child: ListView.builder(
+                  itemCount: state.persons.length,
                     itemBuilder: (_, index) => ListTile(
                           title: Text(state.persons[index]!.name),
                           subtitle: Text(state.persons[index]!.age.toString()),
