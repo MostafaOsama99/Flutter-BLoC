@@ -28,6 +28,7 @@ void main() {
   group('Testing bloc', () {
     // write our test
 
+    // this cannot be final since it will be change per each test
     late PersonsBloc bloc;
 
     /// this function runs before EVERY test in order to initialize all
